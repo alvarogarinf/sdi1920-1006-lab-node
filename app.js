@@ -3,6 +3,9 @@
 // Módulos
 var express = require('express');
 var app = express();
+
+let fileUpload = require('express-fileupload');
+app.use(fileUpload());
 let mongo = require('mongodb');
 var swig = require('swig');
 var bodyParser = require('body-parser');
@@ -46,9 +49,19 @@ app.get('/autores/agregar', function (req, res) {
     res.render('autores-agregar.html',{roles:roles_array});
     res.send(respuesta);
 })
-app.get('/canciones/:id', function (req, res) {
-    var respuesta = 'id: ' + req.params.id;
-    res.send(respuesta);
+app.get('/cancion/:id', function (req, res) {
+    let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) };
+    gestorBD.obtenerCanciones(criterio,function(canciones){
+        if ( canciones == null ){
+            res.send(respuesta);
+        } else {
+            let respuesta = swig.renderFile('views/bcancion.html',
+                {
+                    cancion : canciones[0]
+                });
+            res.send(respuesta);
+        }
+    });
 });
 
 app.get('/autores/:id', function (req, res) {
@@ -81,7 +94,26 @@ app.post("/cancion", function(req, res) {
         if (id == null) {
             res.send("Error al insertar canción");
         } else {
-            res.send("Agregada la canción ID: " + id);
+            if (req.files.portada != null) {
+                let imagen = req.files.portada;
+                imagen.mv('public/portadas/' + id + '.png', function(err) {
+                    if (err) {
+                        res.send("Error al subir la portada");
+                    } else {
+                        if (req.files.audio != null) {
+                            let audio = req.files.audio;
+                            audio.mv('public/audios/'+id+'.mp3', function(err) {
+                                if (err) {
+                                    res.send("Error al subir el audio");
+                                } else {
+                                    res.send("Agregada id: "+ id);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
         }
     });
 });
@@ -139,4 +171,23 @@ app.get("/autores", function (req, res) {
 
 app.get('/autor', function (req,res) {
     res.redirect('/autores');
+});
+
+app.get("/tienda", function(req, res) {
+    let criterio={};
+    if(req.query.busqueda != null){
+        criterio = {"nombre" : {$regex : ".*"+req.query.busqueda+".*"} };
+    }
+    gestorBD.obtenerCanciones(criterio, function(canciones) {
+
+        if (canciones == null) {
+            res.send("Error al listar ");
+        } else {
+            let respuesta = swig.renderFile('views/btienda.html',
+                {
+                    canciones : canciones
+                });
+            res.send(respuesta);
+        }
+    });
 });

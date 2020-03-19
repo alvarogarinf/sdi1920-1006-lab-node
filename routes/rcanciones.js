@@ -25,6 +25,24 @@ module.exports = function (app, swig,gestorBD) {
         });
         res.send(respuesta);
     })
+    app.get("/tienda", function(req, res) {
+        let criterio={};
+        if(req.query.busqueda != null){
+            criterio = {"nombre" : {$regex : ".*"+req.query.busqueda+".*"} };
+        }
+        gestorBD.obtenerCanciones(criterio, function(canciones) {
+
+            if (canciones == null) {
+                res.send("Error al listar ");
+            } else {
+                let respuesta = swig.renderFile('views/btienda.html',
+                    {
+                        canciones : canciones
+                    });
+                res.send(respuesta);
+            }
+        });
+    });
 };
 
 

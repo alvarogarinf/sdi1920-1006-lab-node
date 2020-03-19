@@ -6,6 +6,11 @@ var app = express();
 let mongo = require('mongodb');
 var swig = require('swig');
 var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+let gestorBD = require("./modules/gestorBD.js");
+gestorBD.init(app,mongo);
 
 
 app.use(bodyParser.json());
@@ -18,9 +23,9 @@ app.set('port', 8081);
 app.set('db','mongodb://admin:sdi@tiendamusica-shard-00-00-iay4q.mongodb.net:27017,tiendamusica-shard-00-01-iay4q.mongodb.net:27017,tiendamusica-shard-00-02-iay4q.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
 
 //Rutas/controladores por lógica
-require("./routes/rusuarios.js")(app,swig); // (app, param1, param2, etc.)
-require("./routes/rcanciones.js")(app,swig,mongo); // (app, param1, param2, etc.)
-require("./routes/rautores.js")(app,swig); // (app, param1, param2, etc.)
+require("./routes/rusuarios.js")(app,swig,gestorBD); // (app, param1, param2, etc.)
+require("./routes/rcanciones.js")(app,swig,gestorBD); // (app, param1, param2, etc.)
+require("./routes/rautores.js")(app,swig,gestorBD); // (app, param1, param2, etc.)
 // lanzar el servidor
 app.listen(app.get('port'), function () {
     console.log("Servidor activo");
@@ -71,19 +76,12 @@ app.post("/cancion", function(req, res) {
         precio : req.body.precio
     }
 // Conectarse
-    mongo.MongoClient.connect(app.get('db'), function(err, db) {
-        if (err) {
-            res.send("Error de conexión: " + err);
+    // Conectarse
+    gestorBD.insertarCancion(cancion, function(id){
+        if (id == null) {
+            res.send("Error al insertar canción");
         } else {
-            let collection = db.collection('canciones');
-            collection.insert(cancion, function(err, result) {
-                if (err) {
-                    res.send("Error al insertar " + err);
-                } else {
-                    res.send("Agregada id: "+ result.ops[0]._id);
-                }
-                db.close();
-            });
+            res.send("Agregada la canción ID: " + id);
         }
     });
 });

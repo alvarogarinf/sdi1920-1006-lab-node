@@ -1,4 +1,4 @@
-module.exports = function (app, swig,mongo) {
+module.exports = function (app, swig,gestorBD) {
     app.get("/nuevas/canciones", function (req, res) {
         let canciones = [{
             "nombre": "Blank space",

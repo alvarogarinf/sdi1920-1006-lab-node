@@ -47,15 +47,21 @@ module.exports = function (app, swig, gestorBD) {
 
     app.get('/cancion/:id', function (req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        gestorBD.obtenerCanciones(criterio, function (canciones) {
-            if (canciones == null) {
+        gestorBD.obtenerComentarios(criterio, function(comentarios){
+            if(comentarios == null) {
                 res.send(respuesta);
-            } else {
-                let respuesta = swig.renderFile('views/bcancion.html',
-                    {
-                        cancion: canciones[0]
-                    });
-                res.send(respuesta);
+            }else{
+                gestorBD.obtenerCanciones(criterio, function (canciones) {
+                    if (canciones == null) {
+                        res.send(respuesta);
+                    }
+                    let respuesta = swig.renderFile('views/bcancion.html',
+                        {
+                            comentario: comentarios,
+                            cancion: canciones[0]
+                        });
+                    res.send(respuesta);
+                });
             }
         });
     });

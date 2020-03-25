@@ -15,7 +15,7 @@ module.exports = function (app,swig,gestorBD) {
         }
         gestorBD.insertarUsuario(usuario, function (id) {
             if (id == null) {
-                res.redirect("/identificarse" +
+                res.redirect("/registrarse" +
                     "?mensaje=Error al registrar usuario");
             } else {
                 res.redirect("/identificarse" +
@@ -36,9 +36,12 @@ module.exports = function (app,swig,gestorBD) {
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null || usuarios.length == 0) {
-                res.redirect("/registrarse?mensaje=Error al registrar usuario");
+                res.redirect("/identificarse" +
+                    "?mensaje=Email o password incorrecto"+
+                    "&tipoMensaje=alert-danger");
             } else {
-                res.redirect("/registrarse?mensaje=Nuevo usuario registrado");
+                req.session.usuario = usuarios[0].email;
+                res.redirect("/publicaciones");
             }
         });
     });

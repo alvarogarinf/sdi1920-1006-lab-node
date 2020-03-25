@@ -60,7 +60,7 @@ routerUsuarioAutor.use(function(req, res, next) {
 });
 //Aplicar routerUsuarioAutor
 app.use("/cancion/modificar",routerUsuarioAutor);
-app.use("/cancion/eliminar",routerUsuarioAutor);a
+app.use("/cancion/eliminar",routerUsuarioAutor);
 
 //routerAudios
 let routerAudios = express.Router();

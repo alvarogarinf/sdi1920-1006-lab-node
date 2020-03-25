@@ -60,7 +60,7 @@ routerUsuarioAutor.use(function(req, res, next) {
 });
 //Aplicar routerUsuarioAutor
 app.use("/cancion/modificar",routerUsuarioAutor);
-app.use("/cancion/eliminar",routerUsuarioAutor);
+app.use("/cancion/eliminar",routerUsuarioAutor);a
 
 //routerAudios
 let routerAudios = express.Router();
@@ -94,6 +94,11 @@ require("./routes/rusuarios.js")(app,swig,gestorBD); // (app, param1, param2, et
 require("./routes/rcanciones.js")(app,swig,gestorBD); // (app, param1, param2, etc.)
 require("./routes/rautores.js")(app,swig,gestorBD); // (app, param1, param2, etc.)
 require("./routes/rcomentarios.js")(app,swig,gestorBD); // (app, param1, param2, etc.)
+
+app.get('/', function (req, res) {
+    res.redirect('/tienda');
+})
+
 // lanzar el servidor
 app.listen(app.get('port'), function () {
     console.log("Servidor activo");

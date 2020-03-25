@@ -10,7 +10,9 @@
             <h2>{{ cancion.nombre }}</h2>
             <p>{{ cancion.autor }}</p>
             <p>{{ cancion.genero }}</p>
-            <p> {{comentarios[0] }}</p>
+            {% for comentario in comentarios %}
+            <p> {{comentario.text}}</p>
+            {% endfor %}
             <button type="button" class="btn btn-primary pull-right">{{ cancion.precio }}
                 €
             </button>
